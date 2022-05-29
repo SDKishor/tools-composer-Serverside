@@ -54,6 +54,15 @@ async function run() {
       res.send(tools);
     });
 
+    app.get("/users", async (req, res) => {
+      const query = {};
+      const cursor = usercollection.find(query);
+      const user = await cursor.toArray();
+
+      console.log(user);
+      res.send(user);
+    });
+
     app.get("/tools/:id", varifyJWT, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
@@ -66,11 +75,27 @@ async function run() {
       const email = req.params.email;
       const query = { email: email };
       const user = await usercollection.findOne(query);
-      console.log(user.role);
+
       res.send(user);
     });
 
+    app.post("/additems", async (req, res) => {
+      const doc = req.body;
+      const result = await toolscollection.insertOne(doc);
+      res.send(result);
+    });
+
+    //delete
+    app.delete("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await usercollection.deleteOne(query);
+
+      app.send(result);
+    });
+
     //put method
+
     app.put("/user/:email", async (req, res) => {
       const email = req.params.email;
       const user = req.body;
