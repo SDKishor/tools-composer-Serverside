@@ -93,6 +93,13 @@ async function run() {
 
       app.send(result);
     });
+    app.delete("/tools/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await toolscollection.deleteOne(query);
+
+      app.send(result);
+    });
 
     //put method
 
