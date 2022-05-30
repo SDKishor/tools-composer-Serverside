@@ -46,6 +46,7 @@ async function run() {
     const toolscollection = client.db("toolcomposer").collection("tools");
     const usercollection = client.db("toolcomposer").collection("user");
     const reviewcollection = client.db("toolcomposer").collection("review");
+    const ordercollection = client.db("toolcomposer").collection("orders");
 
     app.get("/tools", async (req, res) => {
       const query = {};
@@ -57,6 +58,13 @@ async function run() {
     app.get("/reviews", async (req, res) => {
       const query = {};
       const cursor = reviewcollection.find(query);
+      const review = await cursor.toArray();
+
+      res.send(review);
+    });
+    app.get("/orders", varifyJWT, async (req, res) => {
+      const query = {};
+      const cursor = ordercollection.find(query);
       const review = await cursor.toArray();
 
       res.send(review);
@@ -87,11 +95,25 @@ async function run() {
       res.send(user);
     });
 
+    app.get("/orders/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const cursor = ordercollection.find(query);
+      const users = await cursor.toArray();
+
+      res.send(users);
+    });
+
     // post
 
     app.post("/additems", async (req, res) => {
       const doc = req.body;
       const result = await toolscollection.insertOne(doc);
+      res.send(result);
+    });
+    app.post("/addorder", async (req, res) => {
+      const doc = req.body;
+      const result = await ordercollection.insertOne(doc);
       res.send(result);
     });
 
@@ -113,6 +135,14 @@ async function run() {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await toolscollection.deleteOne(query);
+
+      app.send(result);
+    });
+
+    app.delete("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await ordercollection.deleteOne(query);
 
       app.send(result);
     });
