@@ -45,6 +45,7 @@ async function run() {
     await client.connect();
     const toolscollection = client.db("toolcomposer").collection("tools");
     const usercollection = client.db("toolcomposer").collection("user");
+    const reviewcollection = client.db("toolcomposer").collection("review");
 
     app.get("/tools", async (req, res) => {
       const query = {};
@@ -52,6 +53,13 @@ async function run() {
       const tools = await cursor.toArray();
 
       res.send(tools);
+    });
+    app.get("/reviews", async (req, res) => {
+      const query = {};
+      const cursor = reviewcollection.find(query);
+      const review = await cursor.toArray();
+
+      res.send(review);
     });
 
     app.get("/users", async (req, res) => {
@@ -63,7 +71,7 @@ async function run() {
       res.send(user);
     });
 
-    app.get("/tools/:id", varifyJWT, async (req, res) => {
+    app.get("/tools/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const tool = await toolscollection.findOne(query);
@@ -79,9 +87,17 @@ async function run() {
       res.send(user);
     });
 
+    // post
+
     app.post("/additems", async (req, res) => {
       const doc = req.body;
       const result = await toolscollection.insertOne(doc);
+      res.send(result);
+    });
+
+    app.post("/addreview", async (req, res) => {
+      const doc = req.body;
+      const result = await reviewcollection.insertOne(doc);
       res.send(result);
     });
 
